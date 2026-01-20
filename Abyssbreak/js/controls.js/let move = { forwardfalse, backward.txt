@@ -1,0 +1,43 @@
+let move = { forward:false, backward:false, left:false, right:false, up:false, down:false };
+let controls;
+
+function setupControls(camera, domElement) {
+    controls = new THREE.PointerLockControls(camera, domElement);
+
+    domElement.addEventListener('click', () => controls.lock());
+
+    document.addEventListener('keydown', e => {
+        if(e.code==='KeyW') move.forward=true;
+        if(e.code==='KeyS') move.backward=true;
+        if(e.code==='KeyA') move.left=true;
+        if(e.code==='KeyD') move.right=true;
+        if(e.code==='Space') move.up=true;
+        if(e.code==='ShiftLeft') move.down=true;
+    });
+
+    document.addEventListener('keyup', e => {
+        if(e.code==='KeyW') move.forward=false;
+        if(e.code==='KeyS') move.backward=false;
+        if(e.code==='KeyA') move.left=false;
+        if(e.code==='KeyD') move.right=false;
+        if(e.code==='Space') move.up=false;
+        if(e.code==='ShiftLeft') move.down=false;
+    });
+
+    return controls;
+}
+
+function updateControls(dt) {
+    const speed = 20*dt;
+    let dir = new THREE.Vector3();
+    if(move.forward) dir.z -= speed;
+    if(move.backward) dir.z += speed;
+    if(move.left) dir.x -= speed;
+    if(move.right) dir.x += speed;
+    if(move.up) dir.y += speed;
+    if(move.down) dir.y -= speed;
+
+    controls.moveRight(dir.x);
+    controls.moveForward(dir.z);
+    controls.getObject().position.y += dir.y;
+}

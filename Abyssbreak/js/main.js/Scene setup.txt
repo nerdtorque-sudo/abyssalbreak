@@ -1,0 +1,65 @@
+// Scene setup
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x111111);
+
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+camera.position.set(0,10,20);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Lights
+scene.add(new THREE.AmbientLight(0xffffff, 0.4));
+const dirLight = new THREE.DirectionalLight(0xffffff, 1);
+dirLight.position.set(50,50,25);
+scene.add(dirLight);
+
+// Floor
+const floorGeo = new THREE.PlaneGeometry(100,100,32,32);
+const floorMat = new THREE.MeshStandardMaterial({ color:0x003366, side:THREE.DoubleSide });
+const floor = new THREE.Mesh(floorGeo,floorMat);
+floor.rotation.x = -Math.PI/2;
+scene.add(floor);
+
+// Pit
+const pitGeo = new THREE.CylinderGeometry(10,10,20,64,true);
+const pitMat = new THREE.MeshStandardMaterial({ color:0x000000, side:THREE.DoubleSide, transparent:true, opacity:0.8 });
+const pit = new THREE.Mesh(pitGeo,pitMat);
+pit.position.y = -10;
+scene.add(pit);
+
+// Helicopter placeholder
+const heliGeo = new THREE.BoxGeometry(2,1,1);
+const heliMat = new THREE.MeshStandardMaterial({ color:0x888888 });
+const heli = new THREE.Mesh(heliGeo,heliMat);
+heli.position.set(0,25,0);
+scene.add(heli);
+
+// Controls
+const controls = setupControls(camera, document.body);
+
+// Clock
+const clock = new THREE.Clock();
+
+function animate() {
+    requestAnimationFrame(animate);
+    const dt = clock.getDelta();
+
+    // Update controls
+    updateControls(dt);
+
+    // Update physics
+    updateBalls(dt);
+
+    renderer.render(scene, camera);
+}
+
+animate();
+
+// Resize
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
